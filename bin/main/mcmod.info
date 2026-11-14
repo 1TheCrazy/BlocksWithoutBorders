@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "${modid}",
+    "name": "No Borders",
+    "description": "Cycle between windowed, fullscreen and borderless fullscreen in Video Settings or with F11.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "You"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

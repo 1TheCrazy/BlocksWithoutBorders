@@ -1,11 +1,11 @@
 [
   {
     "modid": "${modid}",
-    "name": "Xample Mod",
-    "description": "A mod that is used as an example.",
+    "name": "No Borders",
+    "description": "Cycle between windowed, fullscreen and borderless fullscreen in Video Settings or with F11.",
     "version": "${version}",
     "mcversion": "${mcversion}",
-    "url": "https://github.com/romangraef/Forge1.8.9Template/",
+    "url": "",
     "updateUrl": "",
     "authorList": [
       "You"

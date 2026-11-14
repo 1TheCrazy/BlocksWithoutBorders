@@ -1,43 +1,57 @@
-# Architectury Loom based template for 1.8.9 forge mods
+# No Borders
 
-**For other templates, do check out the [other branches of this repository](https://github.com/romangraef/Forge1.8.9Template/branches/all)**
+Client-side Minecraft **1.8.9 / Forge 11.15.1.2318** mod with Mixin-based display modes.
 
-## Usage
+In **Options > Video Settings**, the vanilla Fullscreen button becomes **Display Mode**.
+Click it, or press the configured fullscreen key (F11 by default), to cycle:
 
-Check out https://moddev.nea.moe/ for a full tutorial on legacy modding.
+**Windowed > Fullscreen > Borderless > Windowed**
 
-Alternatively, read here for a basic overview on how to use this repository.
+Borderless is an undecorated window covering the monitor where the game was windowed.
+It uses that monitor's full desktop bounds, including the taskbar area, without entering
+exclusive fullscreen. Returning to windowed mode restores the previous window position
+and client size for the current session. Exclusive fullscreen uses Minecraft's normal
+display-mode selection.
 
-To get started, [Use this template](https://github.com/new?template_name=Forge1.8.9Template&template_owner=lineargraph).
+On Windows, borderless also removes the native WS_POPUP style. This prevents the OpenGL
+driver from treating a screen-sized popup as exclusive fullscreen when focus changes.
+Saved borderless sessions start windowed before applying borderless, avoiding an initial
+exclusive display-mode switch. Reference: https://github.com/libsdl-org/SDL/issues/12791.
 
-> [!WARNING]
-> Do not Fork or Clone or Download ZIP this template. If you "use" this template a custom mod id will be generated. You can do that manually using the `make-my-own` script, if you are on linux. If not, just click the use this template button. If you want to use kotlin or make a 1.12 mod check the "Include all branches" and change the default branch in https://github.com/yourname/yourreponame/branches
+The selected mode is saved immediately to 'config/noborders.properties' in the game
+directory and restored on the next launch. Without that file, the mod respects
+Minecraft's existing fullscreen preference. The file accepts 'mode=WINDOWED',
+'mode=FULLSCREEN', or 'mode=BORDERLESS'. Minecraft's own fullscreen flag is enabled only
+for exclusive fullscreen; borderless remains a native windowed display.
 
-This project uses [DevAuth](https://github.com/DJtheRedstoner/DevAuth) per default, so you can log in using your real
-minecraft account. If you don't need that, you can remove it from the buildscript.
+## Build
 
-To run the mod you will need two JDKs, one Java 17 jdk and one Java 1.8 jdk. You can download those
-from [here](https://adoptium.net/temurin/releases) (or use your own downloads).
+Use JDK 17 to run Gradle and install JDK 8 for the Minecraft toolchain.
 
-When you import your project into IntelliJ, you need to set the gradle jvm to the Java 17 JDK in the gradle tab, and the
-Project SDK to the Java 1.8 JDK. Then click on the sync button in IntelliJ, and it should create a run task
-called `Minecraft Client`. If it doesn't then try relaunching your IntelliJ. **Warning for Mac users**: You might have to remove the `-XStartOnFirstThread` vm argument from your run configuration. In the future, that should be handled by the plugin, but for now you'll probably have to do that manually.
+Windows:
 
-To export your project, run the `gradle build` task, and give other people the
-file `build/libs/<modid>-<version>.jar`. Ignore the jars in the `build/badjars` folder. Those are intermediary jars that
-are used by the build system but *do not work* in a normal forge installation.
+    .\gradlew.bat build
 
-If you don't want mixins (which allow for modifying vanilla code), then you can remove the references to mixins from
-the `build.gradle.kts` at the lines specified with comments and the `com.example.mixin` package.
+Linux/macOS:
 
-If you don't want access transformers (which allow for making methods public/non-final) you can delete the
-`accesstransformer.cfg` file. If you make a change to the `accesstransformers.cfg` you might need to rebuild your
-project using `./gradlew build --refresh-dependencies`.
+    ./gradlew build
 
-### For those who have not an attention span
+Install 'build/libs/noborders-1.0.0.jar' in the Forge instance's 'mods' directory.
+Development client: './gradlew runClientCompat'. This task works around the template's
+Loom 0.10 / Gradle 8 launch incompatibility and uses the 1.8.9 LaunchWrapper entry point.
 
-[![Youtube Tutorial](https://i.ytimg.com/vi/nWzHlomdCgc/maxresdefault.jpg)](https://www.youtube.com/watch?v=nWzHlomdCgc)
+## Manual verification
 
-## Licensing
+- Cycle all three modes using Video Settings and F11, both at the main menu and in a world.
+- Resize and move the window, cycle through the modes, and check its restored size/position.
+- In borderless mode, check that no title bar/borders are present, the desktop is covered,
+  Alt-Tab works, mouse capture returns in-game, and menus and rendering fill the window.
+- Move the window to another monitor before cycling and check borderless fills that monitor.
+- Restart in each mode and check the saved mode is restored.
+- Check VSync and different GUI scales while switching.
 
-This template is licensed under the Unlicense (license copy present in this repository), or alternatively under [Creative Commons 1.0 Universal (CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/), and all contributions and PR to this template are expected to follow this. This means your mod, based on this template can be licensed whatever way you want, and does not need to reference back to this template in any way.
+Mixed-DPI monitor setups and window-manager-specific behavior need testing on the
+target desktop. The implementation uses LWJGL 2 native window recreation and AWT monitor
+bounds; exclusive fullscreen retains Minecraft 1.8.9's monitor limitations.
+
+Based on the Architectury Loom Forge 1.8.9 template.

@@ -150,3 +150,21 @@ tasks.shadowJar {
 
 tasks.assemble.get().dependsOn(tasks.remapJar)
 
+
+// Loom 0.10's RunGameTask uses legacy JavaExec APIs rejected by Gradle 8.
+// Reuse its launch configuration through a regular JavaExec task.
+tasks.register<JavaExec>("runClientCompat") {
+    group = "loom"
+    description = "Runs the Minecraft 1.8.9 client with Gradle 8."
+    dependsOn("classes", "downloadAssets")
+    val legacyClient = tasks.named<JavaExec>("runClient").get()
+    classpath = legacyClient.classpath
+    mainClass.set("net.fabricmc.devlaunchinjector.Main")
+    setJvmArgs(legacyClient.jvmArgs.orEmpty().filterNot { it.startsWith("-Dfabric.dli.main=") })
+    systemProperty("fabric.dli.main", "net.minecraft.launchwrapper.Launch")
+    args(legacyClient.args.orEmpty())
+    workingDir = file("run").apply { mkdirs() }
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    })
+}
